@@ -1,8 +1,7 @@
 package;
 
-#if desktop
-import Discord.DiscordClient;
-#end
+
+import discord_rpc.DiscordRpc;
 import flixel.FlxG;
 import flixel.FlxObject;
 import flixel.FlxSprite;
@@ -26,7 +25,7 @@ class MainMenuState extends MusicBeatState
 	var menuItems:FlxTypedGroup<FlxSprite>;
 
 	#if !switch
-	var optionShit:Array<String> = ['story mode', 'freeplay', 'donate', 'options'];
+	var optionShit:Array<String> = ['story mode', 'freeplay', 'full version'];
 	#else
 	var optionShit:Array<String> = ['story mode', 'freeplay'];
 	#end
@@ -36,22 +35,24 @@ class MainMenuState extends MusicBeatState
 
 	override function create()
 	{
+		
+
 		#if desktop
 		// Updating Discord Rich Presence
-		DiscordClient.changePresence("In the Menus", null);
+		DiscordRpc.shutdown();
 		#end
-
+		
 		transIn = FlxTransitionableState.defaultTransIn;
 		transOut = FlxTransitionableState.defaultTransOut;
 
 		if (!FlxG.sound.music.playing)
 		{
-			FlxG.sound.playMusic(Paths.music('freakyMenu'));
+			FlxG.sound.playMusic('assets/music/freakyMenu' + TitleState.soundExt);
 		}
 
 		persistentUpdate = persistentDraw = true;
 
-		var bg:FlxSprite = new FlxSprite(-80).loadGraphic(Paths.image('menuBG'));
+		var bg:FlxSprite = new FlxSprite(-80).loadGraphic('assets/images/menuBG.png');
 		bg.scrollFactor.x = 0;
 		bg.scrollFactor.y = 0.18;
 		bg.setGraphicSize(Std.int(bg.width * 1.1));
@@ -63,7 +64,7 @@ class MainMenuState extends MusicBeatState
 		camFollow = new FlxObject(0, 0, 1, 1);
 		add(camFollow);
 
-		magenta = new FlxSprite(-80).loadGraphic(Paths.image('menuDesat'));
+		magenta = new FlxSprite(-80).loadGraphic('assets/images/menuDesat.png');
 		magenta.scrollFactor.x = 0;
 		magenta.scrollFactor.y = 0.18;
 		magenta.setGraphicSize(Std.int(magenta.width * 1.1));
@@ -78,7 +79,7 @@ class MainMenuState extends MusicBeatState
 		menuItems = new FlxTypedGroup<FlxSprite>();
 		add(menuItems);
 
-		var tex = Paths.getSparrowAtlas('FNF_main_menu_assets');
+		var tex = FlxAtlasFrames.fromSparrow('assets/images/FNF_main_menu_assets.png', 'assets/images/FNF_main_menu_assets.xml');
 
 		for (i in 0...optionShit.length)
 		{
@@ -96,9 +97,9 @@ class MainMenuState extends MusicBeatState
 
 		FlxG.camera.follow(camFollow, null, 0.06);
 
-		var versionShit:FlxText = new FlxText(5, FlxG.height - 18, 0, "v" + Application.current.meta.get('version'), 12);
+		var versionShit:FlxText = new FlxText(500, FlxG.height - 718, 0, "Luigi Ping Funkin Demo v" + Application.current.meta.get('version'), 12);
 		versionShit.scrollFactor.set();
-		versionShit.setFormat("VCR OSD Mono", 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		versionShit.setFormat("Super Mario Maker 2 Regular", 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		add(versionShit);
 
 		// NG.core.calls.event.logEvent('swag').send();
@@ -121,13 +122,13 @@ class MainMenuState extends MusicBeatState
 		{
 			if (controls.UP_P)
 			{
-				FlxG.sound.play(Paths.sound('scrollMenu'));
+				FlxG.sound.play('assets/sounds/scrollMenu' + TitleState.soundExt);
 				changeItem(-1);
 			}
 
 			if (controls.DOWN_P)
 			{
-				FlxG.sound.play(Paths.sound('scrollMenu'));
+				FlxG.sound.play('assets/sounds/scrollMenu' + TitleState.soundExt);
 				changeItem(1);
 			}
 
@@ -138,18 +139,14 @@ class MainMenuState extends MusicBeatState
 
 			if (controls.ACCEPT)
 			{
-				if (optionShit[curSelected] == 'donate')
+				if (optionShit[curSelected] == 'full version')
 				{
-					#if linux
-					Sys.command('/usr/bin/xdg-open', ["https://ninja-muffin24.itch.io/funkin", "&"]);
-					#else
-					FlxG.openURL('https://ninja-muffin24.itch.io/funkin');
-					#end
+					FlxG.switchState(new VideoState('assets/videos/Luigi Ping Funkin Full Version Promo.webm', new MainMenuState())); // can't believe i got this to work i actually did something
 				}
 				else
-				{
+				{	
 					selectedSomethin = true;
-					FlxG.sound.play(Paths.sound('confirmMenu'));
+					FlxG.sound.play('assets/sounds/confirmMenu' + TitleState.soundExt);
 
 					FlxFlicker.flicker(magenta, 1.1, 0.15, false);
 
@@ -182,8 +179,6 @@ class MainMenuState extends MusicBeatState
 										trace("Freeplay Menu Selected");
 
 									case 'options':
-										FlxTransitionableState.skipNextTransIn = true;
-										FlxTransitionableState.skipNextTransOut = true;
 										FlxG.switchState(new OptionsMenu());
 								}
 							});

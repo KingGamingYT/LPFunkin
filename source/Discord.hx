@@ -1,9 +1,20 @@
 package;
 
 import Sys.sleep;
+import Discord.DiscordClient;
 import discord_rpc.DiscordRpc;
 
+// I SWEAR TO GOD I JUST CAN'T GET THIS DAMN FILE TO WORK I HAVE TRIED SO MUCH AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 using StringTools;
+
+@:enum abstract IdleType(String) to String
+{
+	var TITLE = "Title Screen";
+	var MAIN_MENU = "Main Menu";
+	var STORY_MENU = "Story Menu";
+	var FREEPLAY_MENU = "Freeplay Menu";
+	var OPTIONS_MENU = "Options Menu";
+}
 
 class DiscordClient
 {
@@ -11,7 +22,7 @@ class DiscordClient
 	{
 		trace("Discord Client starting...");
 		DiscordRpc.start({
-			clientID: "814588678700924999",
+			clientID: "847165982857756742",
 			onReady: onReady,
 			onError: onError,
 			onDisconnected: onDisconnected
@@ -28,10 +39,10 @@ class DiscordClient
 		DiscordRpc.shutdown();
 	}
 
-	public static function shutdown()
+	public static function shutdown()    
 	{
-		DiscordRpc.shutdown();
-	}
+		DiscordRpc.shutdown();   
+	} 
 	
 	static function onReady()
 	{
@@ -55,10 +66,16 @@ class DiscordClient
 
 	public static function initialize()
 	{
+		
+		#if cpp
+		
 		var DiscordDaemon = sys.thread.Thread.create(() ->
 		{
 			new DiscordClient();
 		});
+
+		#end
+
 		trace("Discord Client initialized");
 	}
 

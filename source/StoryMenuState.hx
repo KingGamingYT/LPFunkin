@@ -1,8 +1,6 @@
 package;
 
-#if desktop
-import Discord.DiscordClient;
-#end
+
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.addons.transition.FlxTransitionableState;
@@ -24,35 +22,29 @@ class StoryMenuState extends MusicBeatState
 
 	var weekData:Array<Dynamic> = [
 		['Tutorial'],
-		['Bopeebo', 'Fresh', 'Dadbattle'],
-		['Spookeez', 'South', "Monster"],
-		['Pico', 'Philly', "Blammed"],
-		['Satin-Panties', "High", "Milf"],
-		['Cocoa', 'Eggnog', 'Winter-Horrorland'],
-		['Senpai', 'Roses', 'Thorns']
+		['Glasses', 'Lazy'],
+		['Spookeez', 'Carlos', "Blue Hoodie"],
+		['Geometry', 'Void'],
+		['Mainframe', 'Backdoor', 'Critical Error']
 	];
 	var curDifficulty:Int = 1;
-
-	public static var weekUnlocked:Array<Bool> = [true, true, true, true, true, true, true];
+// NOTE TO KING: WHEN YOU EXPORT THE GAME FOR THE FIRST PUBLIC DEMO FOR PEOPLE MAKE SURE TO LOCK DOWN EVERYTHING BUT THE TUTORIAL AND WEEK 1
+	public static var weekUnlocked:Array<Bool> = [true, true, false, false, false, false, false];
 
 	var weekCharacters:Array<Dynamic> = [
 		['dad', 'bf', 'gf'],
 		['dad', 'bf', 'gf'],
 		['spooky', 'bf', 'gf'],
 		['pico', 'bf', 'gf'],
-		['mom', 'bf', 'gf'],
-		['parents-christmas', 'bf', 'gf'],
 		['senpai', 'bf', 'gf']
 	];
 
 	var weekNames:Array<String> = [
-		"",
-		"Daddy Dearest",
-		"Spooky Month",
-		"PICO",
-		"MOMMY MUST MURDER",
-		"RED SNOW",
-		"hating simulator ft. moawling"
+		"TUTORIAL",
+		"The Lead Moron",
+		"The Dimwitted Duo",
+		"RIOT",
+		"the mainframe"
 	];
 
 	var txtWeekTitle:FlxText;
@@ -79,8 +71,10 @@ class StoryMenuState extends MusicBeatState
 		if (FlxG.sound.music != null)
 		{
 			if (!FlxG.sound.music.playing)
-				FlxG.sound.playMusic(Paths.music('freakyMenu'));
+				FlxG.sound.playMusic('assets/music/freakyMenu' + TitleState.soundExt);
 		}
+		
+	
 
 		persistentUpdate = persistentDraw = true;
 
@@ -93,11 +87,11 @@ class StoryMenuState extends MusicBeatState
 
 		var rankText:FlxText = new FlxText(0, 10);
 		rankText.text = 'RANK: GREAT';
-		rankText.setFormat(Paths.font("vcr.ttf"), 32);
+		rankText.setFormat("assets/fonts/vcr.ttf", 32);
 		rankText.size = scoreText.size;
 		rankText.screenCenter(X);
 
-		var ui_tex = Paths.getSparrowAtlas('campaign_menu_UI_assets');
+		var ui_tex = FlxAtlasFrames.fromSparrow('assets/images/campaign_menu_UI_assets.png', 'assets/images/campaign_menu_UI_assets.xml');
 		var yellowBG:FlxSprite = new FlxSprite(0, 56).makeGraphic(FlxG.width, 400, 0xFFF9CF51);
 
 		grpWeekText = new FlxTypedGroup<MenuItem>();
@@ -112,11 +106,6 @@ class StoryMenuState extends MusicBeatState
 		add(grpLocks);
 
 		trace("Line 70");
-		
-		#if desktop
-		// Updating Discord Rich Presence
-		DiscordClient.changePresence("In the Menus", null);
-		#end
 
 		for (i in 0...weekData.length)
 		{
@@ -279,7 +268,7 @@ class StoryMenuState extends MusicBeatState
 
 		if (controls.BACK && !movedBack && !selectedWeek)
 		{
-			FlxG.sound.play(Paths.sound('cancelMenu'));
+			FlxG.sound.play('assets/sounds/cancelMenu' + TitleState.soundExt);
 			movedBack = true;
 			FlxG.switchState(new MainMenuState());
 		}
@@ -297,9 +286,9 @@ class StoryMenuState extends MusicBeatState
 		{
 			if (stopspamming == false)
 			{
-				FlxG.sound.play(Paths.sound('confirmMenu'));
+				FlxG.sound.play('assets/sounds/confirmMenu' + TitleState.soundExt);
 
-				grpWeekText.members[curWeek].startFlashing();
+				grpWeekText.members[curWeek].week.animation.resume();
 				grpWeekCharacters.members[1].animation.play('bfConfirm');
 				stopspamming = true;
 			}
@@ -325,7 +314,9 @@ class StoryMenuState extends MusicBeatState
 			PlayState.campaignScore = 0;
 			new FlxTimer().start(1, function(tmr:FlxTimer)
 			{
-				LoadingState.loadAndSwitchState(new PlayState(), true);
+				if (FlxG.sound.music != null)
+					FlxG.sound.music.stop();
+				FlxG.switchState(new PlayState());
 			});
 		}
 	}
@@ -391,7 +382,7 @@ class StoryMenuState extends MusicBeatState
 			bullShit++;
 		}
 
-		FlxG.sound.play(Paths.sound('scrollMenu'));
+		FlxG.sound.play('assets/sounds/scrollMenu' + TitleState.soundExt);
 
 		updateText();
 	}
